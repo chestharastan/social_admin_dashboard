@@ -11,7 +11,8 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (state?.error) toast.error(state.error);
-  }, [state]);
+    if (state?.success) toast.success('Logged in successfully.');
+  }, [state, toast]);
 
   return (
     <div className="h-[100dvh] flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-blue-50 px-4 overflow-hidden">
