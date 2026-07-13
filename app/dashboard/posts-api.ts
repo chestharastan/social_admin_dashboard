@@ -10,6 +10,7 @@ export type PostType = {
 export type PostImage = {
   id: string;
   image_url: string;
+  image_role: 'cover' | 'gallery';
   caption?: string | null;
   sort_order?: number | null;
 };
@@ -72,6 +73,16 @@ export async function fetchAdminPosts() {
   }
 
   return fetchBackendArray<AdminPost>('/posts/admin', token);
+}
+
+export async function fetchAdminPost(postId: string) {
+  if (!postId) {
+    return { data: null, error: 'Choose a post to view.' };
+  }
+
+  return backendJsonRequest<AdminPost>(
+    `/posts/admin/${encodeURIComponent(postId)}`
+  );
 }
 
 export async function backendJsonRequest<T>(

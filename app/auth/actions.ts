@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
   AUTH_REFRESH_TOKEN_COOKIE,
+  AUTH_REMEMBER_COOKIE,
   AUTH_REMEMBER_MAX_AGE,
   AUTH_TOKEN_COOKIE,
   getAuthApiBaseUrl,
@@ -88,6 +89,12 @@ export async function handleLoginAction(
     });
   }
 
+  cookieStore.set({
+    name: AUTH_REMEMBER_COOKIE,
+    value: remember ? '1' : '0',
+    ...cookieOptions,
+  });
+
   redirect('/dashboard');
 }
 
@@ -96,6 +103,7 @@ export async function handleLogoutAction() {
 
   cookieStore.delete(AUTH_TOKEN_COOKIE);
   cookieStore.delete(AUTH_REFRESH_TOKEN_COOKIE);
+  cookieStore.delete(AUTH_REMEMBER_COOKIE);
 
   redirect('/auth');
 }

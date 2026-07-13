@@ -5,11 +5,13 @@ import { backendJsonRequest } from '@/app/dashboard/posts-api';
 
 export type PostActionState = {
   ok?: boolean;
+  created?: boolean;
   message?: string;
   error?: string;
 };
 
 export type UploadedImage = {
+  image_id: string;
   bucket: string;
   path: string;
   url: string;
@@ -25,6 +27,7 @@ export type UploadActionState = {
 };
 
 type JsonBody = Record<string, unknown>;
+type CreatedPost = { id: string };
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 const SUPPORTED_IMAGE_TYPES = [
@@ -39,23 +42,37 @@ export async function createPostAction(
   _prevState: PostActionState,
   formData: FormData
 ): Promise<PostActionState> {
-  const payload = buildPostPayload(formData, true);
+  const payload = buildPostPayload(formData);
 
   if ('error' in payload) {
     return { error: payload.error };
   }
 
-  const result = await backendJsonRequest('/posts', {
+  const result = await backendJsonRequest<CreatedPost>('/posts', {
     method: 'POST',
     body: JSON.stringify(payload.body),
   });
 
-  if (result.error) {
-    return { error: result.error };
+  if (result.error || !result.data?.id) {
+    return { error: result.error ?? 'Post creation did not return a post ID.' };
+  }
+
+  const imageIds = getStagedImageIds(formData);
+
+  if (imageIds.length) {
+    const attachResult = await attachImagesToPost(result.data.id, imageIds);
+
+    if (attachResult.error) {
+      revalidatePath('/dashboard');
+      return {
+        created: true,
+        error: `Post created, but its images could not be attached: ${attachResult.error}`,
+      };
+    }
   }
 
   revalidatePath('/dashboard');
-  return { ok: true, message: 'Post created.' };
+  return { ok: true, created: true, message: 'Post created.' };
 }
 
 export async function updatePostAction(
@@ -67,7 +84,7 @@ export async function updatePostAction(
     return { error: 'Choose a post to update.' };
   }
 
-  const payload = buildPostPayload(formData, false);
+  const payload = buildPostPayload(formData);
 
   if ('error' in payload) {
     return { error: payload.error };
@@ -80,6 +97,24 @@ export async function updatePostAction(
 
   if (result.error) {
     return { error: result.error };
+  }
+
+  if (formData.get('image_order_changed') === 'true') {
+    const imageIds = getStagedImageIds(formData);
+    const orderResult = await backendJsonRequest('/images/order', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        post_id: postId,
+        image_ids: imageIds,
+      }),
+    });
+
+    if (orderResult.error) {
+      revalidatePath('/dashboard');
+      return {
+        error: `Post updated, but the image order could not be saved: ${orderResult.error}`,
+      };
+    }
   }
 
   revalidatePath('/dashboard');
@@ -103,72 +138,12 @@ export async function deletePostAction(postId: string): Promise<PostActionState>
   return { ok: true, message: 'Post deleted.' };
 }
 
-export async function addPostImageAction(
-  postId: string,
-  _prevState: PostActionState,
-  formData: FormData
-): Promise<PostActionState> {
-  if (!postId) {
-    return { error: 'Choose a post before adding an image.' };
-  }
-
-  const payload = buildImagePayload(formData, true);
-
-  if ('error' in payload) {
-    return { error: payload.error };
-  }
-
-  const result = await backendJsonRequest(`/posts/${postId}/images`, {
-    method: 'POST',
-    body: JSON.stringify(payload.body),
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  revalidatePath('/dashboard');
-  return { ok: true, message: 'Gallery image added.' };
-}
-
-export async function updatePostImageAction(
-  postId: string,
-  imageId: string,
-  _prevState: PostActionState,
-  formData: FormData
-): Promise<PostActionState> {
-  if (!postId || !imageId) {
-    return { error: 'Choose an image to update.' };
-  }
-
-  const payload = buildImagePayload(formData, false);
-
-  if ('error' in payload) {
-    return { error: payload.error };
-  }
-
-  const result = await backendJsonRequest(`/posts/${postId}/images/${imageId}`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload.body),
-  });
-
-  if (result.error) {
-    return { error: result.error };
-  }
-
-  revalidatePath('/dashboard');
-  return { ok: true, message: 'Gallery image updated.' };
-}
-
-export async function deletePostImageAction(
-  postId: string,
-  imageId: string
-): Promise<PostActionState> {
-  if (!postId || !imageId) {
+export async function deleteImageAction(imageId: string): Promise<PostActionState> {
+  if (!imageId) {
     return { error: 'Choose an image to delete.' };
   }
 
-  const result = await backendJsonRequest(`/posts/${postId}/images/${imageId}`, {
+  const result = await backendJsonRequest(`/images/${imageId}`, {
     method: 'DELETE',
   });
 
@@ -177,156 +152,95 @@ export async function deletePostImageAction(
   }
 
   revalidatePath('/dashboard');
-  return { ok: true, message: 'Gallery image deleted.' };
+  return { ok: true, message: 'Image deleted.' };
 }
 
-export async function uploadNewPostCoverAction(
+export async function uploadImagesBatchAction(
   formData: FormData
 ): Promise<UploadActionState> {
-  const fileResult = getOneImageFile(formData);
-
-  if ('error' in fileResult) {
-    return { error: fileResult.error };
-  }
-
-  const uploadForm = new FormData();
-  uploadForm.set('file', fileResult.file);
-
-  const result = await backendJsonRequest<UploadedImage>('/posts/uploads/covers', {
-    method: 'POST',
-    body: uploadForm,
-  });
-
-  if (result.error || !result.data?.url) {
-    return { error: result.error ?? 'Upload did not return an image URL.' };
-  }
-
-  return {
-    ok: true,
-    message: 'Cover uploaded.',
-    upload: result.data,
-  };
+  return uploadImagesBatch(formData);
 }
 
-export async function uploadNewPostGalleryAction(
-  formData: FormData
-): Promise<UploadActionState> {
-  const fileResult = getOneImageFile(formData);
-
-  if ('error' in fileResult) {
-    return { error: fileResult.error };
-  }
-
-  const uploadForm = new FormData();
-  uploadForm.set('file', fileResult.file);
-
-  const result = await backendJsonRequest<UploadedImage>('/posts/uploads/gallery', {
-    method: 'POST',
-    body: uploadForm,
-  });
-
-  if (result.error || !result.data?.url) {
-    return { error: result.error ?? 'Upload did not return an image URL.' };
-  }
-
-  return {
-    ok: true,
-    message: 'Gallery image uploaded.',
-    upload: result.data,
-  };
-}
-
-export async function uploadExistingPostCoverAction(
+export async function uploadAndAttachImagesAction(
   postId: string,
   formData: FormData
 ): Promise<UploadActionState> {
   if (!postId) {
-    return { error: 'Choose a post before uploading a cover.' };
+    return { error: 'Choose a post before uploading images.' };
   }
 
-  const fileResult = getOneImageFile(formData);
+  const uploadResult = await uploadImagesBatch(formData);
 
-  if ('error' in fileResult) {
-    return { error: fileResult.error };
+  if (uploadResult.error || !uploadResult.uploads?.length) {
+    return uploadResult;
   }
 
-  const uploadForm = new FormData();
-  uploadForm.set('file', fileResult.file);
-
-  const result = await backendJsonRequest<UploadedImage>(
-    `/posts/${postId}/cover`,
-    {
-      method: 'POST',
-      body: uploadForm,
-    }
+  const attachResult = await attachImagesToPost(
+    postId,
+    uploadResult.uploads.map((upload) => upload.image_id)
   );
 
-  if (result.error || !result.data?.url) {
-    return { error: result.error ?? 'Upload did not return an image URL.' };
+  if (attachResult.error) {
+    return { error: attachResult.error };
   }
 
   revalidatePath('/dashboard');
 
   return {
     ok: true,
-    message: 'Cover uploaded and updated.',
-    upload: result.data,
+    message: `${uploadResult.uploads.length} image${
+      uploadResult.uploads.length === 1 ? '' : 's'
+    } uploaded and attached.`,
+    uploads: uploadResult.uploads,
   };
 }
 
-export async function uploadExistingPostGalleryAction(
-  postId: string,
-  formData: FormData
-): Promise<UploadActionState> {
-  if (!postId) {
-    return { error: 'Choose a post before uploading gallery images.' };
-  }
-
+async function uploadImagesBatch(formData: FormData): Promise<UploadActionState> {
   const filesResult = getImageFiles(formData);
 
   if ('error' in filesResult) {
     return { error: filesResult.error };
   }
 
-  const files = filesResult.files;
   const uploadForm = new FormData();
-  const isMultiUpload = files.length > 1;
 
-  for (const file of files) {
-    uploadForm.append(isMultiUpload ? 'files' : 'file', file);
+  for (const file of filesResult.files) {
+    uploadForm.append('files', file);
   }
 
-  const result = await backendJsonRequest<UploadedImage | UploadedImage[]>(
-    isMultiUpload
-      ? `/posts/${postId}/images/uploads`
-      : `/posts/${postId}/images/upload`,
-    {
-      method: 'POST',
-      body: uploadForm,
-    }
-  );
+  const result = await backendJsonRequest<UploadedImage[]>('/images/batch', {
+    method: 'POST',
+    body: uploadForm,
+  });
 
-  if (result.error || !result.data) {
-    return { error: result.error ?? 'Upload did not return image data.' };
+  if (
+    result.error ||
+    !result.data?.length ||
+    result.data.some((upload) => !upload.image_id || !upload.url)
+  ) {
+    return { error: result.error ?? 'Batch upload did not return valid image data.' };
   }
-
-  revalidatePath('/dashboard');
-
-  const uploads = Array.isArray(result.data) ? result.data : [result.data];
 
   return {
     ok: true,
-    message: `${uploads.length} gallery image${
-      uploads.length === 1 ? '' : 's'
+    message: `${result.data.length} image${
+      result.data.length === 1 ? '' : 's'
     } uploaded.`,
-    uploads,
+    uploads: result.data,
   };
 }
 
-function buildPostPayload(
-  formData: FormData,
-  includeImages: boolean
-): { body: JsonBody } | { error: string } {
+async function attachImagesToPost(postId: string, imageIds: string[]) {
+  return backendJsonRequest('/images', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      post_id: postId,
+      image_ids: imageIds,
+    }),
+  });
+}
+
+function buildPostPayload(formData: FormData): { body: JsonBody } | { error: string } {
   const title = getText(formData, 'title');
   const content = getText(formData, 'content');
   const typeId = Number(formData.get('type_id'));
@@ -351,70 +265,11 @@ function buildPostPayload(
     featured: formData.get('featured') === 'on',
   };
 
-  const slug = getText(formData, 'slug');
-  const coverImage = getText(formData, 'cover_image');
-
-  if (slug) {
-    body.slug = slug;
-  }
-
-  if (coverImage) {
-    body.cover_image = coverImage;
-  }
-
-  if (includeImages) {
-    const images = buildImageList(formData);
-
-    if (images.length) {
-      body.images = images;
-    }
-  }
-
   return { body };
 }
 
-function buildImageList(formData: FormData) {
-  const urls = formData.getAll('image_url').map(stringValue);
-  const captions = formData.getAll('image_caption').map(stringValue);
-  const sortOrders = formData.getAll('image_sort_order').map(stringValue);
-
-  return urls
-    .map((imageUrl, index) => {
-      if (!imageUrl) {
-        return null;
-      }
-
-      return {
-        image_url: imageUrl,
-        caption: captions[index] || undefined,
-        sort_order: parseSortOrder(sortOrders[index], index),
-      };
-    })
-    .filter(Boolean);
-}
-
-function buildImagePayload(
-  formData: FormData,
-  requireUrl: boolean
-): { body: JsonBody } | { error: string } {
-  const imageUrl = getText(formData, 'image_url');
-  const caption = getText(formData, 'caption');
-  const sortOrder = getText(formData, 'sort_order');
-
-  if (requireUrl && !imageUrl) {
-    return { error: 'Image URL is required.' };
-  }
-
-  const body: JsonBody = {};
-
-  if (imageUrl) {
-    body.image_url = imageUrl;
-  }
-
-  body.caption = caption;
-  body.sort_order = parseSortOrder(sortOrder, 0);
-
-  return { body };
+function getStagedImageIds(formData: FormData) {
+  return formData.getAll('image_id').map(stringValue).filter(Boolean);
 }
 
 function getText(formData: FormData, key: string) {
@@ -423,21 +278,6 @@ function getText(formData: FormData, key: string) {
 
 function stringValue(value: FormDataEntryValue | null) {
   return typeof value === 'string' ? value.trim() : '';
-}
-
-function parseSortOrder(value: string, fallback: number) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function getOneImageFile(formData: FormData): { file: File } | { error: string } {
-  const result = getImageFiles(formData);
-
-  if ('error' in result) {
-    return result;
-  }
-
-  return { file: result.files[0] };
 }
 
 function getImageFiles(formData: FormData): { files: File[] } | { error: string } {
