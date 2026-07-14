@@ -1,8 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: only light;
+  --background: #f6f7f2;
+  --foreground: #17201d;
+  --surface: #ffffff;
+  --surface-muted: #f9f9f7;
+  --muted: #65726d;
+  --muted-strong: #47534f;
+  --line: #dce4df;
+  --line-strong: #c9d4ce;
+  --accent: #0f766e;
+  --accent-strong: #0b5f59;
+  --accent-soft: #d9f3ee;
+  --brand: #6d4aff;
+  --brand-strong: #5f3df0;
+  --danger: #b42318;
+  --danger-soft: #fee4e2;
+  --warning: #b45309;
+  --warning-soft: #fff3d6;
+}
+
+html,
+body {
+  color-scheme: only light;
 }
 
 @theme inline {
@@ -12,15 +33,32 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
+  background: #f6f7f2;
+  color: #17201d;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--accent-soft);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

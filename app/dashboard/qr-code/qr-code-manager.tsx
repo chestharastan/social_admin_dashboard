@@ -75,7 +75,7 @@ export default function QrCodeManager({
   return (
     <div className="space-y-8">
       {qrLinksError && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+        <div className="rounded-md border border-[#f4d49a] bg-[var(--warning-soft)] px-4 py-3 text-sm font-medium text-[var(--warning)]">
           QR links: {qrLinksError}
         </div>
       )}
@@ -83,18 +83,18 @@ export default function QrCodeManager({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <form
           action={formAction}
-          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm"
           onSubmit={generatePreview}
         >
-          <h2 className="text-lg font-semibold text-slate-950">Generate and save</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">Generate and save</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Give the QR code a name, then enter any public URL.
           </p>
 
-          <label className="mt-5 grid gap-1.5 text-sm font-medium text-slate-700">
+          <label className="mt-5 grid gap-1.5 text-sm font-medium text-[var(--foreground)]">
             QR name
             <input
-              className="h-11 min-w-0 rounded-lg border border-slate-200 px-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              className="h-11 min-w-0 rounded-md border border-[var(--line)] px-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[#8a9691] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
               maxLength={120}
               name="qr_name"
               onChange={(event) => setName(event.target.value)}
@@ -104,11 +104,11 @@ export default function QrCodeManager({
             />
           </label>
 
-          <label className="mt-4 grid gap-1.5 text-sm font-medium text-slate-700">
+          <label className="mt-4 grid gap-1.5 text-sm font-medium text-[var(--foreground)]">
             URL
             <input
               autoComplete="url"
-              className="h-11 min-w-0 rounded-lg border border-slate-200 px-3 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              className="h-11 min-w-0 rounded-md border border-[var(--line)] px-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[#8a9691] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
               name="qr_url"
               onChange={(event) => setUrl(event.target.value)}
               placeholder="https://example.com"
@@ -119,7 +119,7 @@ export default function QrCodeManager({
           </label>
 
           <button
-            className="mt-4 h-11 rounded-lg bg-blue-600 px-5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:bg-blue-300"
+            className="mt-4 h-11 rounded-md bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
             disabled={isSaving}
             type="submit"
           >
@@ -137,39 +137,39 @@ export default function QrCodeManager({
 
       <section>
         <div className="mb-4 flex items-center gap-3">
-          <h2 className="text-xl font-semibold text-slate-950">Saved QR codes</h2>
-          <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">Saved QR codes</h2>
+          <span className="rounded-full bg-[#ececf1] px-2.5 py-1 text-xs font-semibold text-[#565869]">
             {initialQrLinks.length}
           </span>
         </div>
 
         {initialQrLinks.length ? (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {initialQrLinks.map((qrLink) => (
+            {initialQrLinks.map((qrLink, index) => (
               <button
                 aria-haspopup="dialog"
-                className={`min-w-0 rounded-xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  selectedQr?.qr_id === qrLink.qr_id
-                    ? 'border-blue-500 ring-1 ring-blue-500'
-                    : 'border-slate-200'
+                className={`min-w-0 rounded-md border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] ${
+                  selectedQr === qrLink
+                    ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]'
+                    : 'border-[var(--line)]'
                 }`}
-                key={qrLink.qr_id}
+                key={`${qrLink.qr_name}-${qrLink.qr_url}-${index}`}
                 onClick={() => regenerateSavedQr(qrLink)}
                 type="button"
               >
-                <span className="block truncate text-sm font-semibold text-slate-950">
+                <span className="block truncate text-sm font-semibold text-[var(--foreground)]">
                   {qrLink.qr_name}
                 </span>
-                <span className="mt-1 block truncate text-xs text-slate-500">
+                <span className="mt-1 block truncate text-xs text-[var(--muted)]">
                   {qrLink.qr_url}
                 </span>
               </button>
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-            <h3 className="font-semibold text-slate-950">No saved QR codes</h3>
-            <p className="mt-1 text-sm text-slate-500">
+          <div className="rounded-md border border-dashed border-[var(--line-strong)] bg-white px-6 py-12 text-center shadow-sm">
+            <h3 className="font-semibold text-[var(--foreground)]">No saved QR codes</h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">
               Enter a name and URL to save the first one.
             </p>
           </div>
@@ -178,32 +178,32 @@ export default function QrCodeManager({
 
       {selectedQr && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/65 px-4 py-8 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#17201d]/65 px-4 py-8 backdrop-blur-sm"
           onClick={() => setSelectedQr(null)}
           role="presentation"
         >
           <section
             aria-labelledby="saved-qr-dialog-title"
             aria-modal="true"
-            className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl"
+            className="w-full max-w-md rounded-xl border border-[var(--line)] bg-white p-5 shadow-[0_24px_70px_rgba(23,32,29,0.24)]"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <h2
-                  className="truncate text-xl font-semibold text-slate-950"
+                  className="truncate text-xl font-semibold text-[var(--foreground)]"
                   id="saved-qr-dialog-title"
                 >
                   {selectedQr.qr_name}
                 </h2>
-                <p className="mt-1 break-all text-sm text-slate-500">
+                <p className="mt-1 break-all text-sm text-[var(--muted)]">
                   {selectedQr.qr_url}
                 </p>
               </div>
               <button
                 aria-label="Close QR code"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xl text-[var(--muted)] transition hover:bg-[#ececf1] hover:text-[var(--foreground)]"
                 onClick={() => setSelectedQr(null)}
                 type="button"
               >
@@ -211,7 +211,7 @@ export default function QrCodeManager({
               </button>
             </div>
 
-            <div className="mt-5 flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-3">
+            <div className="mt-5 flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-[var(--line)] bg-white p-3">
               {selectedQrDataUrl ? (
                 // The QR image is generated as a browser data URL and has no remote source.
                 // eslint-disable-next-line @next/next/no-img-element
@@ -221,13 +221,13 @@ export default function QrCodeManager({
                   src={selectedQrDataUrl}
                 />
               ) : (
-                <p className="text-sm text-slate-400">Generating QR code...</p>
+                <p className="text-sm text-[var(--muted)]">Generating QR code...</p>
               )}
             </div>
 
             <div className="mt-5 flex justify-end gap-2">
               <button
-                className="h-10 rounded-lg border border-slate-200 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="h-10 rounded-md border border-[var(--line)] px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-[#f0f4f1]"
                 onClick={() => setSelectedQr(null)}
                 type="button"
               >
@@ -235,7 +235,7 @@ export default function QrCodeManager({
               </button>
               {selectedQrDataUrl && (
                 <a
-                  className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-950 px-4 text-sm font-medium text-white transition hover:bg-slate-800"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
                   download={`${safeFilename(selectedQr.qr_name)}-qr.png`}
                   href={selectedQrDataUrl}
                 >
@@ -262,25 +262,25 @@ function QrPreview({
   url: string;
 }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-950">QR preview</h2>
-      <div className="mt-4 flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3">
+    <section className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-[var(--foreground)]">QR preview</h2>
+      <div className="mt-4 flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-[var(--line-strong)] bg-[var(--surface-muted)] p-3">
         {dataUrl ? (
           // The QR image is generated as a browser data URL and has no remote source.
           // eslint-disable-next-line @next/next/no-img-element
           <img alt={`QR code for ${name || url}`} className="h-full w-full" src={dataUrl} />
         ) : (
-          <p className="max-w-48 text-center text-sm text-slate-400">
+          <p className="max-w-48 text-center text-sm text-[var(--muted)]">
             {placeholder ?? 'Generating preview...'}
           </p>
         )}
       </div>
       {dataUrl && (
         <>
-          <p className="mt-3 truncate text-sm font-semibold text-slate-900">{name}</p>
-          <p className="mt-1 break-all text-xs text-slate-500">{url}</p>
+          <p className="mt-3 truncate text-sm font-semibold text-[var(--foreground)]">{name}</p>
+          <p className="mt-1 break-all text-xs text-[var(--muted)]">{url}</p>
           <a
-            className="mt-3 inline-flex text-sm font-medium text-blue-700 hover:text-blue-800"
+            className="mt-3 inline-flex text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]"
             download={`${safeFilename(name)}-qr.png`}
             href={dataUrl}
           >

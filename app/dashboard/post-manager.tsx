@@ -58,7 +58,6 @@ export default function PostManager({
 }: PostManagerProps) {
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [isAddingPost, setIsAddingPost] = useState(false);
 
   const posts = initialPosts;
 
@@ -102,22 +101,22 @@ export default function PostManager({
   return (
     <>
       {(postsError || postTypesError) && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+        <div className="rounded-md border border-[#f4d49a] bg-[var(--warning-soft)] px-4 py-3 text-sm font-medium text-[var(--warning)]">
           {postsError && <p>Posts: {postsError}</p>}
           {postTypesError && <p>Types: {postTypesError}</p>}
         </div>
       )}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-950">All posts</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <h2 className="text-lg font-semibold text-[var(--foreground)]">Content library</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">
               {filteredPosts.length} of {posts.length} posts shown
             </p>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               <select
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:w-48"
+                className="h-10 w-full rounded-md border border-[var(--line)] bg-white px-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)] sm:w-48"
                 onChange={(event) => setTypeFilter(event.target.value)}
                 value={typeFilter}
               >
@@ -129,7 +128,7 @@ export default function PostManager({
                 ))}
               </select>
               <select
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:w-48"
+                className="h-10 w-full rounded-md border border-[var(--line)] bg-white px-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)] sm:w-48"
                 onChange={(event) => setStatusFilter(event.target.value)}
                 value={statusFilter}
               >
@@ -140,13 +139,13 @@ export default function PostManager({
               </select>
             </div>
           </div>
-          <button
-            className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
-            onClick={() => setIsAddingPost(true)}
-            type="button"
+          <Link
+            className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+            href="/dashboard/posts/new"
+            prefetch
           >
             Add post
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -154,9 +153,9 @@ export default function PostManager({
         <div className="space-y-8">
           {groupedPosts.map((group) => (
             <section key={group.name}>
-              <div className="mb-4 flex items-center gap-3 border-b border-slate-200 pb-3">
-                <h2 className="text-xl font-semibold text-slate-950">{group.name}</h2>
-                <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
+              <div className="mb-4 flex items-center gap-3 border-b border-[var(--line)] pb-3">
+                <h2 className="text-lg font-semibold text-[var(--foreground)]">{group.name}</h2>
+                <span className="rounded-full bg-[#ececf1] px-2.5 py-1 text-xs font-semibold text-[#565869]">
                   {group.posts.length}
                 </span>
               </div>
@@ -169,23 +168,17 @@ export default function PostManager({
           ))}
         </div>
       ) : (
-        <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-lg font-semibold text-slate-500">
+        <div className="flex min-h-64 flex-col items-center justify-center rounded-md border border-dashed border-[var(--line-strong)] bg-white px-6 py-12 text-center shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[var(--accent-soft)] text-lg font-semibold text-[var(--accent-strong)]">
             P
           </div>
-          <h3 className="mt-4 text-base font-semibold text-slate-950">No posts to show</h3>
-          <p className="mt-1 max-w-sm text-sm text-slate-500">
+          <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">No posts to show</h3>
+          <p className="mt-1 max-w-sm text-sm text-[var(--muted)]">
             Adjust the filters or create the first post for the website.
           </p>
         </div>
       )}
 
-      {isAddingPost && (
-        <CreatePostModal
-          onCancel={() => setIsAddingPost(false)}
-          postTypes={postTypes}
-        />
-      )}
     </>
   );
 }
@@ -193,10 +186,10 @@ export default function PostManager({
 function PostCard({ post, postTypes }: { post: AdminPost; postTypes: PostType[] }) {
   return (
     <Link
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="group flex h-full flex-col overflow-hidden rounded-md border border-[var(--line)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2"
       href={`/dashboard/posts/${post.id}`}
     >
-      <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+      <div className="aspect-[16/10] overflow-hidden bg-[var(--surface-muted)]">
         {post.cover_image ? (
           <div
             aria-label={`${post.title} cover`}
@@ -205,7 +198,7 @@ function PostCard({ post, postTypes }: { post: AdminPost; postTypes: PostType[] 
             style={{ backgroundImage: `url(${JSON.stringify(post.cover_image)})` }}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm font-medium text-slate-400">
+          <div className="flex h-full items-center justify-center text-sm font-medium text-[var(--muted)]">
             No cover image
           </div>
         )}
@@ -214,14 +207,14 @@ function PostCard({ post, postTypes }: { post: AdminPost; postTypes: PostType[] 
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <StatusPill active={Boolean(post.published)} label="Published" />
           {post.featured && <StatusPill active label="Featured" />}
-          <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+          <span className="rounded-full bg-[#ececf1] px-2.5 py-1 font-medium text-[#565869]">
             {getTypeName(post, postTypes)}
           </span>
         </div>
-        <h3 className="mt-3 line-clamp-2 text-base font-semibold text-slate-950 group-hover:text-blue-700">
+        <h3 className="mt-3 line-clamp-2 text-base font-semibold text-[var(--foreground)] group-hover:text-[var(--accent-strong)]">
           {post.title}
         </h3>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
           {getContentPreview(post.content)}
         </p>
       </div>
@@ -275,7 +268,7 @@ export function PostEditor({
     <div>
       <div className="mb-5 flex flex-wrap justify-end gap-2">
         <button
-          className="h-10 rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-50"
+          className="h-10 rounded-md border border-[#f3b7b1] bg-white px-4 text-sm font-semibold text-[var(--danger)] transition hover:bg-[var(--danger-soft)] disabled:opacity-50"
           disabled={isDeleting || isUpdating}
           onClick={handleDeletePost}
           type="button"
@@ -283,13 +276,13 @@ export function PostEditor({
           {isDeleting ? 'Deleting...' : 'Delete post'}
         </button>
         <Link
-          className="inline-flex h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          className="inline-flex h-10 items-center rounded-md border border-[var(--line)] bg-white px-4 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[#f0f4f1]"
           href="/dashboard"
         >
           Cancel
         </Link>
         <button
-          className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white transition hover:bg-slate-800 disabled:bg-slate-400"
+          className="h-10 rounded-md bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
           disabled={isUpdating || isDeleting}
           form={formId}
           type="submit"
@@ -298,7 +291,7 @@ export function PostEditor({
         </button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_440px]">
+      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_440px]">
         <EditPostPanel
           formAction={updateFormAction}
           formId={formId}
@@ -320,13 +313,8 @@ export function PostEditor({
   );
 }
 
-function CreatePostModal({
-  onCancel,
-  postTypes,
-}: {
-  onCancel: () => void;
-  postTypes: PostType[];
-}) {
+export function CreatePostForm({ postTypes }: { postTypes: PostType[] }) {
+  const router = useRouter();
   const [state, formAction, isCreating] = useActionState(
     createPostAction,
     INITIAL_ACTION_STATE
@@ -343,9 +331,10 @@ function CreatePostModal({
 
   useEffect(() => {
     if (state.created) {
-      onCancel();
+      router.push('/dashboard');
+      router.refresh();
     }
-  }, [onCancel, state.created]);
+  }, [router, state.created]);
 
   function moveImage(draggedKey: string, targetKey: string) {
     setImageRows((rows) => {
@@ -378,28 +367,28 @@ function CreatePostModal({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-8 backdrop-blur-sm">
-      <form
-        action={formAction}
-        className="w-full max-w-3xl rounded-lg border border-slate-200 bg-white shadow-2xl"
-      >
-        <div className="sticky top-0 z-10 flex flex-col gap-3 border-b border-slate-100 bg-white p-5 sm:flex-row sm:items-start sm:justify-between">
+    <form
+      action={formAction}
+      className="overflow-hidden rounded-md border border-[var(--line)] bg-white shadow-sm"
+    >
+        <div className="flex flex-col gap-3 border-b border-[var(--line)] bg-white p-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-950">Add post</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Fill the details, then create the post.
+            <h2 className="text-lg font-semibold text-[var(--foreground)]">Post details</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              Add the content, status, and images for this post.
             </p>
           </div>
           <div className="flex gap-2">
             <button
-              className="h-10 rounded-lg border border-slate-200 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="h-10 rounded-md border border-[var(--line)] px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-[#f0f4f1]"
               disabled={isRemovingImage}
               onClick={() =>
                 startRemoveImageTransition(async () => {
                   await Promise.all(
                     imageRows.map((image) => deleteImageAction(image.imageId))
                   );
-                  onCancel();
+                  router.push('/dashboard');
+                  router.refresh();
                 })
               }
               type="button"
@@ -407,7 +396,7 @@ function CreatePostModal({
               {isRemovingImage ? 'Cancelling...' : 'Cancel'}
             </button>
             <button
-              className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 disabled:bg-blue-300"
+              className="h-10 rounded-md bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
               disabled={isCreating}
               type="submit"
             >
@@ -419,9 +408,9 @@ function CreatePostModal({
         <div className="p-5">
           <PostFields postTypes={postTypes} />
 
-          <div className="mt-5 border-t border-slate-100 pt-5">
-            <h3 className="text-sm font-semibold text-slate-900">Post images</h3>
-            <p className="mt-1 text-sm text-slate-500">
+          <div className="mt-5 border-t border-[var(--line)] pt-5">
+            <h3 className="text-sm font-semibold text-[var(--foreground)]">Post images</h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">
               The first image becomes the cover. The remaining images become the gallery.
             </p>
             <FileDropZone
@@ -445,10 +434,10 @@ function CreatePostModal({
             <div className="mt-3 space-y-3">
               {imageRows.map((row, index) => (
                 <div
-                  className={`grid grid-cols-[auto_72px_minmax(0,1fr)] gap-3 rounded-lg border bg-slate-50 p-3 transition sm:grid-cols-[auto_72px_minmax(0,1fr)_auto] sm:items-center ${
+                  className={`grid grid-cols-[auto_72px_minmax(0,1fr)] gap-3 rounded-md border bg-[var(--surface-muted)] p-3 transition sm:grid-cols-[auto_72px_minmax(0,1fr)_auto] sm:items-center ${
                     dragOverImageKey === row.key && draggedImageKey !== row.key
-                      ? 'border-blue-400 bg-blue-50'
-                      : 'border-slate-100'
+                      ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
+                      : 'border-[var(--line)]'
                   } ${
                     draggedImageKey === row.key ? 'opacity-60' : ''
                   }`}
@@ -458,7 +447,7 @@ function CreatePostModal({
                   <input name="image_id" type="hidden" value={row.imageId} />
                   <button
                     aria-label={`Drag image ${index + 1} to reorder`}
-                    className="flex h-10 w-8 cursor-grab touch-none select-none items-center justify-center rounded-md text-slate-400 hover:bg-white hover:text-slate-700 active:cursor-grabbing"
+                    className="flex h-10 w-8 cursor-grab touch-none select-none items-center justify-center rounded-md text-[var(--muted)] hover:bg-white hover:text-[var(--foreground)] active:cursor-grabbing"
                     disabled={isRemovingImage}
                     onPointerDown={(event) => {
                       if (event.button !== 0) {
@@ -505,16 +494,16 @@ function CreatePostModal({
                     imageUrl={row.imageUrl}
                   />
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">
+                    <p className="text-sm font-semibold text-[var(--foreground)]">
                       {index === 0 ? 'Cover image' : `Gallery image ${index}`}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-[var(--muted)]">
                       Position {index + 1} in the selected order
                     </p>
                   </div>
                   <div className="col-span-3 flex flex-wrap justify-end gap-2 sm:col-span-1">
                     <button
-                      className="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-40"
+                      className="rounded-md border border-[#f3b7b1] bg-white px-3 py-2 text-sm text-[var(--danger)] hover:bg-[var(--danger-soft)] disabled:opacity-40"
                       disabled={isRemovingImage}
                       onClick={() =>
                         startRemoveImageTransition(async () => {
@@ -540,8 +529,7 @@ function CreatePostModal({
             </div>
           </div>
         </div>
-      </form>
-    </div>
+    </form>
   );
 }
 
@@ -616,10 +604,10 @@ function FileDropZone({
 
   return (
     <label
-      className={`block rounded-lg border border-dashed p-4 transition ${
+      className={`block rounded-md border border-dashed p-4 transition ${
         isDragging
-          ? 'border-blue-400 bg-blue-50'
-          : 'border-slate-300 bg-slate-50 hover:border-slate-400'
+          ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
+          : 'border-[var(--line-strong)] bg-[var(--surface-muted)] hover:border-[var(--muted)]'
       } ${className}`}
       htmlFor={inputId}
       onDragEnter={(event) => {
@@ -653,11 +641,11 @@ function FileDropZone({
         type="file"
       />
       <span className="flex flex-col gap-1 text-sm">
-        <span className="font-semibold text-slate-800">{label}</span>
-        <span className="text-slate-500">
+        <span className="font-semibold text-[var(--foreground)]">{label}</span>
+        <span className="text-[var(--muted)]">
           {isUploading ? 'Uploading...' : 'Drop image files here or click to choose'}
         </span>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-[#8a9691]">
           Up to 10 images, 10 MB each. PNG and JPEG become WebP automatically.
         </span>
       </span>
@@ -679,12 +667,12 @@ function EditPostPanel({
   return (
     <form
       action={formAction}
-      className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+      className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm"
       id={formId}
     >
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Edit post</h2>
-        <p className="mt-1 truncate text-sm text-slate-500">{post.id}</p>
+        <h2 className="text-lg font-semibold text-[var(--foreground)]">Post details</h2>
+        <p className="mt-1 truncate text-sm text-[var(--muted)]">{post.id}</p>
       </div>
       <PostFields post={post} postTypes={postTypes} />
     </form>
@@ -737,16 +725,16 @@ function GalleryPanel({ formId, post }: { formId: string; post: AdminPost }) {
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Post images</h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="text-lg font-semibold text-[var(--foreground)]">Post images</h2>
+        <p className="mt-1 text-sm text-[var(--muted)]">
           Drag images into position. The image at the top is always the cover.
         </p>
       </div>
 
       {hasUnsavedOrder && (
-        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+        <p className="mt-3 rounded-md bg-[var(--warning-soft)] px-3 py-2 text-xs font-medium text-[var(--warning)]">
           The new image order is only saved in this browser. Click Save at the top
           to update the post.
         </p>
@@ -781,7 +769,7 @@ function GalleryPanel({ formId, post }: { formId: string; post: AdminPost }) {
             dragHandle={
               <button
                 aria-label={`Drag image ${index + 1} to reorder`}
-                className="flex h-10 w-8 shrink-0 cursor-grab touch-none select-none items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 w-8 shrink-0 cursor-grab touch-none select-none items-center justify-center rounded-md text-[var(--muted)] hover:bg-[#f0f4f1] hover:text-[var(--foreground)] active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
                 onPointerCancel={finishImageReorder}
                 onPointerDown={(event) => {
                   if (event.button !== 0) {
@@ -837,7 +825,7 @@ function GalleryPanel({ formId, post }: { formId: string; post: AdminPost }) {
           />
         ))}
         {!images.length && (
-          <div className="rounded-lg border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
+          <div className="rounded-md border border-dashed border-[var(--line)] px-4 py-6 text-center text-sm text-[var(--muted)]">
             No images returned for this post.
           </div>
         )}
@@ -865,8 +853,8 @@ function ExistingImageCard({
 
   return (
     <div
-      className={`grid min-w-0 grid-cols-[auto_72px_minmax(0,1fr)] gap-3 overflow-hidden rounded-lg border p-3 transition sm:grid-cols-[auto_72px_minmax(0,1fr)_auto] sm:items-center ${
-        isDropTarget ? 'border-blue-400 bg-blue-50' : 'border-slate-200'
+      className={`grid min-w-0 grid-cols-[auto_72px_minmax(0,1fr)] gap-3 overflow-hidden rounded-md border p-3 transition sm:grid-cols-[auto_72px_minmax(0,1fr)_auto] sm:items-center ${
+        isDropTarget ? 'border-[var(--accent)] bg-[var(--accent-soft)]' : 'border-[var(--line)]'
       } ${isDragging ? 'opacity-60' : 'bg-white'}`}
       data-post-image-id={image.id}
     >
@@ -877,20 +865,20 @@ function ExistingImageCard({
           imageUrl={image.image_url}
         />
         {isCover && (
-          <span className="absolute left-1 top-1 rounded-full bg-blue-600 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white shadow-sm">
+          <span className="absolute left-1 top-1 rounded-full bg-[var(--accent)] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white shadow-sm">
             Cover
           </span>
         )}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-slate-900">
+        <p className="truncate text-sm font-semibold text-[var(--foreground)]">
           {isCover ? 'Cover image' : 'Gallery image'}
         </p>
-        <p className="mt-1 text-xs text-slate-500">Drag to change its position</p>
+        <p className="mt-1 text-xs text-[var(--muted)]">Drag to change its position</p>
       </div>
       <div className="col-span-3 flex justify-end sm:col-span-1">
         <button
-          className="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+          className="rounded-md border border-[#f3b7b1] bg-white px-3 py-2 text-sm text-[var(--danger)] hover:bg-[var(--danger-soft)] disabled:opacity-50"
           disabled={isDeleting}
           onClick={() => {
             if (!confirm(`Delete this ${isCover ? 'cover' : 'gallery'} image?`)) {
@@ -942,10 +930,10 @@ function PostFields({
             The slug is generated automatically from the title.
           </p> */}
         </div>
-        <label className="grid w-full gap-1.5 text-sm font-medium text-slate-700 sm:w-36 sm:shrink-0">
+        <label className="grid w-full gap-1.5 text-sm font-medium text-[var(--foreground)] sm:w-36 sm:shrink-0">
           Type
           <select
-            className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            className="h-11 rounded-md border border-[var(--line)] bg-white px-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
             defaultValue={post?.type_id ?? postTypes[0]?.id ?? ''}
             name="type_id"
             required
@@ -959,10 +947,10 @@ function PostFields({
         </label>
       </div>
 
-      <label className="grid gap-1.5 text-sm font-medium text-slate-700">
+      <label className="grid gap-1.5 text-sm font-medium text-[var(--foreground)]">
         Content
         <textarea
-          className="min-h-36 resize-y rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-950 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          className="min-h-36 resize-y rounded-md border border-[var(--line)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
           defaultValue={post?.content ?? ''}
           name="content"
           required
@@ -990,11 +978,11 @@ function TextInput({
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
-    <label className="grid gap-1.5 text-sm font-medium text-slate-700">
+    <label className="grid gap-1.5 text-sm font-medium text-[var(--foreground)]">
       {label}
       <input
         {...props}
-        className="h-10 w-full min-w-0 rounded-lg border border-slate-200 px-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        className="h-10 w-full min-w-0 rounded-md border border-[var(--line)] px-3 text-sm text-[var(--foreground)] outline-none transition placeholder:text-[#8a9691] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
       />
     </label>
   );
@@ -1010,7 +998,7 @@ function ImagePreview({
   return (
     <div
       aria-label={alt}
-      className="h-[72px] w-full rounded-lg border border-slate-200 bg-slate-100 bg-cover bg-center"
+      className="h-[72px] w-full rounded-md border border-[var(--line)] bg-[var(--surface-muted)] bg-cover bg-center"
       role="img"
       style={{ backgroundImage: `url(${JSON.stringify(imageUrl)})` }}
     />
@@ -1022,10 +1010,10 @@ function CheckInput({
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
   return (
-    <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+    <label className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]">
       <input
         {...props}
-        className="h-4 w-4 rounded border-slate-300 text-blue-600"
+        className="h-4 w-4 rounded border-[var(--line-strong)] accent-[var(--accent)]"
         type="checkbox"
       />
       {label}
@@ -1037,7 +1025,7 @@ function StatusPill({ active, label }: { active: boolean; label: string }) {
   return (
     <span
       className={`rounded-full px-2.5 py-1 font-medium ${
-        active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+        active ? 'bg-[var(--accent-soft)] text-[var(--accent-strong)]' : 'bg-[#ececf1] text-[#6f6f6f]'
       }`}
     >
       {label}

@@ -18,10 +18,10 @@ export default async function DashboardLayout({
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-950">
-      <div className="flex min-h-screen">
+    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className="min-h-screen lg:flex">
         <DashboardSidebar />
-        <section className="min-w-0 flex-1">
+        <section className="min-w-0 flex-1 overflow-x-hidden">
           <MobileDashboardHeader />
           {children}
         </section>
