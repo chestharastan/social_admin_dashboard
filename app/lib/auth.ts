@@ -4,8 +4,11 @@ export const AUTH_REMEMBER_COOKIE = 'ukmac_remember_session';
 export const AUTH_REMEMBER_MAX_AGE = 60 * 60 * 24 * 30;
 
 export function getAuthApiBaseUrl() {
-  return (process.env.AUTH_API_BASE_URL ?? 'http://127.0.0.1:8000').replace(
-    /\/+$/,
-    ''
-  );
+  const baseUrl = process.env.AUTH_API_BASE_URL?.trim();
+
+  if (!baseUrl) {
+    throw new Error('Missing required environment variable: AUTH_API_BASE_URL');
+  }
+
+  return baseUrl.replace(/\/+$/, '');
 }
