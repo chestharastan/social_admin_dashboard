@@ -18,7 +18,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <main className="dashboard-canvas min-h-screen text-[var(--foreground)]">
       <div className="min-h-screen lg:flex">
         <DashboardSidebar />
         <section className="min-w-0 flex-1 overflow-x-hidden">

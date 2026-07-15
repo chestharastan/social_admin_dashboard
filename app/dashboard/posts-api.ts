@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { AUTH_TOKEN_COOKIE, getAuthApiBaseUrl } from '@/app/lib/auth';
+import type { ContentDocument } from '@/app/dashboard/post-content';
 
 export type PostType = {
   id: number;
@@ -20,6 +21,7 @@ export type AdminPost = {
   title: string;
   slug?: string | null;
   content?: string | null;
+  content_json?: ContentDocument | null;
   type_id?: number | null;
   type_slug?: string | null;
   type?: PostType | null;

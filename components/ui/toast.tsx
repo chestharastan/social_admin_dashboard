@@ -71,8 +71,8 @@ export function useToast() {
 function ToastCard({ item, onClose }: { item: ToastItem; onClose: () => void }) {
   const styles = {
     error: { border: 'border-[#f3b7b1]', icon: 'text-[var(--danger)]', title: 'Error' },
-    success: { border: 'border-[#b8ddd5]', icon: 'text-[var(--accent)]', title: 'Success' },
-    info: { border: 'border-[#d8d0ff]', icon: 'text-[var(--brand)]', title: 'Info' },
+    success: { border: 'border-[#d4d4d4]', icon: 'text-[var(--accent)]', title: 'Success' },
+    info: { border: 'border-[#cfcfd4]', icon: 'text-[var(--brand)]', title: 'Info' },
   }[item.type];
 
   return (

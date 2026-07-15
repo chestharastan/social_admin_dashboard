@@ -83,7 +83,7 @@ export default function QrCodeManager({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <form
           action={formAction}
-          className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm"
+          className="glass-panel p-5"
           onSubmit={generatePreview}
         >
           <h2 className="text-lg font-semibold text-[var(--foreground)]">Generate and save</h2>
@@ -98,7 +98,7 @@ export default function QrCodeManager({
               maxLength={120}
               name="qr_name"
               onChange={(event) => setName(event.target.value)}
-              placeholder="Main website"
+              placeholder="QR code name"
               required
               value={name}
             />
@@ -148,9 +148,9 @@ export default function QrCodeManager({
             {initialQrLinks.map((qrLink, index) => (
               <button
                 aria-haspopup="dialog"
-                className={`min-w-0 rounded-md border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] ${
+                className={`glass-panel glass-panel-interactive min-w-0 p-4 text-left focus:outline-none focus:ring-2 focus:ring-[var(--accent)] ${
                   selectedQr === qrLink
-                    ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]'
+                    ? '!border-[var(--accent)] ring-1 ring-[var(--accent)]'
                     : 'border-[var(--line)]'
                 }`}
                 key={`${qrLink.qr_name}-${qrLink.qr_url}-${index}`}
@@ -167,7 +167,7 @@ export default function QrCodeManager({
             ))}
           </div>
         ) : (
-          <div className="rounded-md border border-dashed border-[var(--line-strong)] bg-white px-6 py-12 text-center shadow-sm">
+          <div className="glass-panel border-dashed px-6 py-12 text-center">
             <h3 className="font-semibold text-[var(--foreground)]">No saved QR codes</h3>
             <p className="mt-1 text-sm text-[var(--muted)]">
               Enter a name and URL to save the first one.
@@ -178,14 +178,14 @@ export default function QrCodeManager({
 
       {selectedQr && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#17201d]/65 px-4 py-8 backdrop-blur-sm"
+          className="glass-scrim fixed inset-0 z-50 flex items-center justify-center overflow-y-auto px-4 py-8"
           onClick={() => setSelectedQr(null)}
           role="presentation"
         >
           <section
             aria-labelledby="saved-qr-dialog-title"
             aria-modal="true"
-            className="w-full max-w-md rounded-xl border border-[var(--line)] bg-white p-5 shadow-[0_24px_70px_rgba(23,32,29,0.24)]"
+            className="glass-modal w-full max-w-md p-5"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
           >
@@ -262,7 +262,7 @@ function QrPreview({
   url: string;
 }) {
   return (
-    <section className="rounded-md border border-[var(--line)] bg-white p-5 shadow-sm">
+    <section className="glass-panel p-5">
       <h2 className="text-lg font-semibold text-[var(--foreground)]">QR preview</h2>
       <div className="mt-4 flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-[var(--line-strong)] bg-[var(--surface-muted)] p-3">
         {dataUrl ? (

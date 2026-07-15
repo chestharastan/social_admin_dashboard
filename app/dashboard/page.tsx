@@ -1,7 +1,17 @@
+// app/dashboard/page.tsx
 import PostManager from '@/app/dashboard/post-manager';
 import { getDashboardPostsData } from '@/app/dashboard/posts-api';
+import { KpiCard } from '@/components/ui/kpi-card';
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ createdPost?: string | string[] }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const createdPostId = Array.isArray(resolvedSearchParams.createdPost)
+    ? resolvedSearchParams.createdPost[0]
+    : resolvedSearchParams.createdPost;
   const { posts, postTypes, postsError, postTypesError } =
     await getDashboardPostsData();
   const publishedPosts = posts.filter((post) => post.published === true).length;
@@ -30,10 +40,10 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 pb-6 pt-3 sm:px-6 sm:pb-8 sm:pt-4 lg:px-8">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div>
-          <h1 className="text-2xl font-semibold tracking-normal text-[var(--foreground)] sm:text-3xl">
+          <h1 className="type-display text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
             Dashboard
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
@@ -48,27 +58,13 @@ export default async function DashboardPage() {
         </h2>
         <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
-            <div
-              className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-5 shadow-sm"
-              key={stat.label}
-            >
-              <dt className="text-sm font-medium text-[var(--muted)]">
-                {stat.label}
-              </dt>
-              <dd className="mt-3">
-                <span className="block text-3xl font-semibold tracking-tight text-[var(--foreground)]">
-                  {stat.value}
-                </span>
-                <span className="mt-2 block text-sm text-[var(--muted)]">
-                  {stat.helper}
-                </span>
-              </dd>
-            </div>
+            <KpiCard key={stat.label} {...stat} />
           ))}
         </dl>
       </section>
 
       <PostManager
+        createdPostId={createdPostId}
         initialPosts={posts}
         postTypes={postTypes}
         postsError={postsError}

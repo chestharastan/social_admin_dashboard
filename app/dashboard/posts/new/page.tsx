@@ -11,9 +11,9 @@ export default async function NewPostPage() {
     : FALLBACK_POST_TYPES;
 
   return (
-    <div className="flex w-full flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div className="flex w-full flex-col gap-8 px-4 pb-6 pt-3 sm:px-6 sm:pb-8 sm:pt-4 lg:px-8">
       <header>
-        <h1 className="text-2xl font-semibold tracking-normal text-[var(--foreground)] sm:text-3xl">
+        <h1 className="type-display text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
           Create post
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">

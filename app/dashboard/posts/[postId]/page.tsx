@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { PostEditor } from '@/app/dashboard/post-manager';
 import {
   FALLBACK_POST_TYPES,
@@ -21,24 +20,15 @@ export default async function PostDetailsPage({
     : FALLBACK_POST_TYPES;
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 pb-6 pt-3 sm:px-6 sm:pb-8 sm:pt-4 lg:px-8">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div className="min-w-0">
-          <h1 className="break-words text-2xl font-semibold tracking-normal text-[var(--foreground)] sm:text-3xl">
+          <h1 className="type-display break-words text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
             {postResult.data?.title ?? 'Post unavailable'}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
             Edit the post content, publishing status, and image order.
           </p>
-        </div>
-        <div className="flex shrink-0 gap-2">
-          <Link
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--line)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--muted-strong)] shadow-sm transition hover:border-[var(--line-strong)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]"
-            href="/dashboard"
-          >
-            <span aria-hidden="true">←</span>
-            Back to posts
-          </Link>
         </div>
       </header>
 
@@ -52,7 +42,7 @@ export default async function PostDetailsPage({
       {postResult.data ? (
         <PostEditor post={postResult.data} postTypes={postTypes} />
       ) : (
-        <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center shadow-sm">
+        <div className="glass-panel p-8 text-center">
           <h2 className="text-lg font-semibold text-[var(--foreground)]">
             Post could not be loaded
           </h2>
