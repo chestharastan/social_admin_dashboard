@@ -1597,19 +1597,30 @@ function PostFields({
     String(post?.type_id ?? postTypes[0]?.id ?? '')
   );
   const [title, setTitle] = useState(post?.title ?? '');
+  const isNewPost = !post;
+  const [published, setPublished] = useState(post?.published ? 'on' : 'off');
+  const [featured, setFeatured] = useState(post?.featured ?? false);
 
   return (
     <div className="grid gap-4">
-      <input
-        name="published"
-        type="hidden"
-        value={post?.published ? 'on' : 'off'}
-      />
-      <input
-        name="featured"
-        type="hidden"
-        value={post?.featured ? 'on' : 'off'}
-      />
+      {isNewPost ? (
+        <input name="published" type="hidden" value={published} />
+      ) : (
+        <input
+          name="published"
+          type="hidden"
+          value={post?.published ? 'on' : 'off'}
+        />
+      )}
+      {isNewPost ? (
+        <input name="featured" type="hidden" value={featured ? 'on' : 'off'} />
+      ) : (
+        <input
+          name="featured"
+          type="hidden"
+          value={post?.featured ? 'on' : 'off'}
+        />
+      )}
       <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end">
         <label className="min-w-0 flex-1">
           <span className="sr-only">Story title</span>
@@ -1657,6 +1668,47 @@ function PostFields({
           />
         </div>
       </div>
+
+      {isNewPost && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            aria-pressed={published === 'on'}
+            className={`inline-flex h-9 items-center gap-2 rounded-full border px-4 text-sm font-medium shadow-sm transition ${
+              published === 'on'
+                ? 'border-transparent bg-[var(--accent-soft)] text-[var(--accent-strong)]'
+                : 'border-[var(--line)] bg-white/80 text-[var(--foreground)] hover:border-[var(--line-strong)]'
+            }`}
+            onClick={() =>
+              setPublished((current) => (current === 'on' ? 'off' : 'on'))
+            }
+            type="button"
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                published === 'on' ? 'bg-[var(--accent-strong)]' : 'bg-[#9a9a9a]'
+              }`}
+            />
+            {published === 'on' ? 'Published' : 'Draft'}
+          </button>
+          <button
+            aria-pressed={featured}
+            className={`inline-flex h-9 items-center gap-2 rounded-full border px-4 text-sm font-medium shadow-sm transition ${
+              featured
+                ? 'border-transparent bg-[var(--accent-soft)] text-[var(--accent-strong)]'
+                : 'border-[var(--line)] bg-white/80 text-[var(--foreground)] hover:border-[var(--line-strong)]'
+            }`}
+            onClick={() => setFeatured((current) => !current)}
+            type="button"
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                featured ? 'bg-[var(--accent-strong)]' : 'bg-[#9a9a9a]'
+              }`}
+            />
+            Feature this post
+          </button>
+        </div>
+      )}
 
       <PostBlockEditor
         availableImages={availableImages}

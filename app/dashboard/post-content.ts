@@ -120,6 +120,12 @@ export function parseContentDocument(
   return { version: 1, blocks };
 }
 
+const FILENAME_PATTERN = /\.(jpe?g|png|gif|webp|svg)$/i;
+
+function isFilenameLike(text: string): boolean {
+  return FILENAME_PATTERN.test(text);
+}
+
 export function plainTextFromDocument(document: ContentDocument): string {
   const parts: string[] = [];
 
@@ -131,13 +137,13 @@ export function plainTextFromDocument(document: ContentDocument): string {
 
     if (block.type === 'image') {
       const label = block.data.caption?.trim() || block.data.alt.trim();
-      if (label) parts.push(label);
+      if (label && !isFilenameLike(label)) parts.push(label);
       continue;
     }
 
     for (const image of block.data.images) {
       const label = image.caption?.trim() || image.alt.trim();
-      if (label) parts.push(label);
+      if (label && !isFilenameLike(label)) parts.push(label);
     }
   }
 

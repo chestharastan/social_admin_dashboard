@@ -105,9 +105,6 @@ export async function createPostAction(
     return { error: payload.error };
   }
 
-  // New posts always begin as drafts. Publishing remains an explicit edit action.
-  payload.body.published = false;
-
   const result = await backendJsonRequest<CreatedPost>('/posts', {
     method: 'POST',
     body: JSON.stringify(payload.body),
